@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Savoria — Your Orders</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400;1,600&family=Jost:wght@200;300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --cream: #e8e9f5;
+    --warm-white: #faf7f2;
+    --sand: #e7e1db;
+    --taupe: #b9874e;
+    --brown: #120b01f3;
+    --dark: #040100e6;
+    --green: #4a6a4a;
+    --text-light: #ede5dc;
+  }
+  body { font-family: 'Jost', sans-serif; background:#e8d5c4; color: var(--dark); min-height: 100vh; }
+
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 1.2rem 3rem;
+    background: rgba(76, 55, 19, 0.95);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid rgba(139,111,71,0.1);
+  }
+  .nav-logo { font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 2rem; font-weight: 300; color: var(--dark); text-decoration: none; }
+  .nav-links { display: flex; gap: 0.3rem; }
+  .nav-links a { text-decoration: none; color: var(--text-light); font-size: 0.72rem; font-weight: 300; letter-spacing: 0.2em; text-transform: uppercase; padding: 0.5rem 1rem; border-radius: 50px; transition: all 0.3s; border: 1px solid transparent; }
+  .nav-links a:hover { color: var(--dark); border-color: rgba(139,111,71,0.25); background: rgba(139,111,71,0.05); }
+
+  .page {
+    min-height: 100vh;
+    padding: 8rem 4rem 4rem;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+
+  .page-eyebrow { font-size: 0.68rem; letter-spacing: 0.4em; text-transform: uppercase; color: var(--taupe); margin-bottom: 0.5rem; }
+
+  .page-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic; font-weight: 300;
+    font-size: clamp(2.5rem, 6vw, 4rem);
+    color: var(--dark); margin-bottom: 0.5rem;
+  }
+
+  .page-sub {
+    font-size: 0.85rem; font-weight: 300;
+    color: var(--taupe); margin-bottom: 3rem;
+  }
+
+  .order-card {
+    background:#ffffff;
+    border-radius: 20px;
+    overflow: hidden;
+    border: 1px solid rgba(212,184,150,0.25);
+    box-shadow: 0 4px 30px rgba(139,111,71,0.06);
+    margin-bottom: 2rem;
+  }
+
+  .order-header {
+    padding: 1.5rem 2rem;
+    background: linear-gradient(135deg, rgb(90, 62, 16), rgb(85, 58, 11));
+    border-bottom: 1px solid rgba(212,184,150,0.2);
+    display: flex; align-items: center; justify-content: space-between;
+  }
+
+  .order-header h3 {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic; font-size: 1.4rem; font-weight: 300;
+    color: var(--taupe);
+  }
+
+  .order-count {
+    font-size: 0.75rem; font-weight: 300;
+    color: var(--taupe); letter-spacing: 0.1em;
+  
+  }
+
+  .empty-state {
+    padding: 4rem 2rem;
+    text-align: center;
+    color: var(--text-light);
+  }
+
+  .empty-state .big-emoji { font-size: 4rem; margin-bottom: 1rem; display: block; }
+  .empty-state h3 { font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 1.8rem; color: var(--dark); margin-bottom: 0.5rem; }
+  .empty-state p { font-size: 0.85rem; font-weight: 300; }
+
+  .order-item {
+    display: flex; align-items: center; gap: 1rem;
+    padding: 1.2rem 2rem;
+    border-bottom: 1px solid rgba(212,184,150,0.1);
+    transition: background 0.2s;
+  }
+  .order-item:last-child { border-bottom: none; }
+  .order-item:hover { background: rgba(245,240,232,0.5); }
+
+  .item-img {
+  width: 90px;
+  height: 90px;
+  border-radius: 12px;
+  overflow: hidden;
+  flex-shrink: 0;
+  border: 1px solid rgba(0,0,0,0.05);
+}
+
+.item-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+  .item-details { flex: 1; }
+  .item-name { font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 1.3rem; color: var(--dark); }
+  .item-cat { font-size: 1rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--taupe); font-weight: 300; }
+
+  .item-price { font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 1.5rem; color: var(--brown); }
+
+  .remove-btn {
+    background: none; border: none;
+    color: rgba(139,111,71,0.35); cursor: pointer;
+    font-size: 1.1rem; padding: 0.3rem;
+    transition: color 0.2s;
+    border-radius: 50%;
+  }
+  .remove-btn:hover { color: #c44a4a; background: rgba(196,74,74,0.08); }
+
+  .total-bar {
+    background: linear-gradient(135deg, #3a2e22, #5a4030);
+    border-radius: 20px;
+    padding: 2rem 2.5rem;
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 2rem;
+    color: var(--cream);
+  }
+
+  .total-label { font-size: 0.8rem; letter-spacing: 0.2em; text-transform: uppercase; opacity: 0.6; margin-bottom: 0.3rem; }
+  .total-amount { font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 2.5rem; font-weight: 300; }
+
+  .actions { display: flex; gap: 1rem; justify-content: flex-end; flex-wrap: wrap; }
+
+  .btn-more {
+    padding: 0.9rem 2rem;
+    background: transparent;
+    border: 1px solid rgba(139,111,71,0.4);
+    border-radius: 50px;
+    color: var(--brown);
+    font-family: 'Jost', sans-serif;
+    font-size: 0.82rem; letter-spacing: 0.12em; text-transform: uppercase;
+    cursor: pointer; text-decoration: none;
+    transition: all 0.3s; display: inline-flex; align-items: center; gap: 0.5rem;
+  }
+  .btn-more:hover { background: rgba(139,111,71,0.06); }
+
+  .btn-pay {
+    padding: 0.9rem 2.5rem;
+    background: linear-gradient(135deg, #c4995a, #8b6f47);
+    border: none; border-radius: 50px;
+    color: #fff;
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic; font-size: 1.1rem;
+    cursor: pointer; text-decoration: none;
+    transition: all 0.3s; display: inline-flex; align-items: center; gap: 0.5rem;
+    box-shadow: 0 4px 20px rgba(139,111,71,0.35);
+  }
+  .btn-pay:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(139,111,71,0.45); }
+  .btn-pay:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="/home" class="nav-logo">Savoria</a>
+  <div class="nav-links">
+    <a href="/home">Home</a>
+    <a href="/menu">Menu</a>
+    <a href="/order">Order</a>
+    <a href="/payment">Payment</a>
+    <a href="/feedback">Feedback</a>
+  </div>
+</nav>
+
+<div class="page">
+  <p class="page-eyebrow">✦ Your Selection</p>
+  <h1 class="page-title">Your Orders</h1>
+  <p class="page-sub">Review your items before proceeding to payment</p>
+
+  <div class="order-card">
+    <div class="order-header">
+      <h3>Cart Items</h3>
+      <span class="order-count" id="item-count">Loading...</span>
+    </div>
+    <div id="order-list">
+      <div class="empty-state">
+        <span class="big-emoji">🍽️</span>
+        <h3>Loading your order...</h3>
+        <p>Please wait</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="total-bar" id="total-bar" style="display:none">
+    <div>
+      <div class="total-label">Order Total</div>
+      <div class="total-amount" id="total-amount">₹0</div>
+    </div>
+    <div style="font-size:0.78rem; opacity:0.5; font-style:italic; font-family:'Cormorant Garamond',serif;">
+      Taxes &amp; charges included
+    </div>
+  </div>
+
+  <div class="actions">
+    <a href="/menu" class="btn-more">🛍️ Add More Items</a>
+    <a href="/payment" class="btn-pay" id="pay-btn">Pay Now 💳</a>
+  </div>
+</div>
+
+<script>
+let items = [];
+
+async function loadCart() {
+  const res = await fetch('/api/cart');
+  const data = await res.json();
+  items = data.items || [];
+  renderCart();
+}
+
+function renderCart() {
+  const list = document.getElementById('order-list');
+  const totalBar = document.getElementById('total-bar');
+  const payBtn = document.getElementById('pay-btn');
+
+  document.getElementById('item-count').textContent =
+    `${items.length} item${items.length !== 1 ? 's' : ''}`;
+
+  if (items.length === 0) {
+    list.innerHTML = `
+      <div class="empty-state">
+        <span class="big-emoji">🍃</span>
+        <h3>Your cart is empty</h3>
+        <p>Add some delicious items from our menu</p>
+      </div>`;
+    totalBar.style.display = 'none';
+    payBtn.style.opacity = '0.4';
+    payBtn.style.pointerEvents = 'none';
+    return;
+  }
+
+  const total = items.reduce((sum, i) => sum + i.item_price, 0);
+
+  list.innerHTML = items.map(item => `
+    <div class="order-item" id="item-${item.id}">
+      
+      <div class="item-img">
+        <img src="${item.item_image}" alt="${item.item_name}">
+      </div>
+
+      <div class="item-details">
+        <div class="item-name">${item.item_name}</div>
+        <div class="item-cat">${item.category || 'Food'}</div>
+      </div>
+
+      <div class="item-price">₹${item.item_price}</div>
+
+      <button class="remove-btn" onclick="removeItem(${item.id})">✕</button>
+    </div>
+  `).join('');
+
+  document.getElementById('total-amount').textContent = `₹${total}`;
+  totalBar.style.display = 'flex';
+  payBtn.style.opacity = '';
+  payBtn.style.pointerEvents = '';
+
+  localStorage.setItem('savoria_total', total);
+}
+async function removeItem(id) {
+  await fetch(`/api/cart/${id}`, { method: 'DELETE' });
+  items = items.filter(i => i.id !== id);
+  const el = document.getElementById(`item-${id}`);
+  if (el) { el.style.opacity = '0'; el.style.transform = 'translateX(20px)'; setTimeout(() => renderCart(), 300); }
+  else renderCart();
+}
+
+loadCart();
+</script>
+</body>
+</html>

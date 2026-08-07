@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Savoria — Login</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400;1,600&family=Jost:wght@200;300;400&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --cream: #f5f0e8;
+    --warm-white: #faf7f2;
+    --sand: #d4b896;
+    --taupe: #b89a7a;
+    --brown: #8b6f47;
+    --dark: #3a2e22;
+    --green: #5a7a5a;
+    --text-light: #7a6a58;
+  }
+
+  body {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Jost', sans-serif;
+    overflow: hidden;
+    position: relative;
+    background: #2a1f14;
+  }
+
+  /* Cafe background using CSS art inspired by the warm boho cafe */
+  .bg {
+    position: fixed; inset: 0;
+    background:url("images/loginpg.jpeg"),
+      radial-gradient(ellipse 80% 60% at 50% 80%, rgba(180,140,90,0.25) 0%, transparent 70%),
+      radial-gradient(ellipse 50% 40% at 20% 30%, rgba(200,170,120,0.15) 0%, transparent 60%),
+      radial-gradient(ellipse 40% 50% at 80% 20%, rgba(160,130,90,0.12) 0%, transparent 60%),
+      linear-gradient(160deg, #1a1208 0%, #2d200f 30%, #3d2d18 55%, #2a1f14 100%);
+    z-index: 0;
+  }
+
+  /* Arch decorations like the cafe */
+  .bg::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: 
+      radial-gradient(ellipse 30% 20% at 10% 50%, rgba(245,230,200,0.06) 0%, transparent 100%),
+      radial-gradient(ellipse 25% 35% at 90% 40%, rgba(245,230,200,0.05) 0%, transparent 100%);
+  }
+
+  .bg-img {
+    position: fixed; inset: 0;
+    background: url('/images/loginpg.jpeg') center/cover no-repeat;
+    opacity: 0.18;
+    z-index: 0;
+  }
+
+  /* Warm glow from ceiling like cafe lights */
+  .ceiling-glow {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    height: 40%;
+    background: radial-gradient(ellipse 70% 100% at 50% -10%, rgba(210,170,100,0.2) 0%, transparent 80%);
+    z-index: 0;
+    pointer-events: none;
+  }
+
+  .floor-glow {
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    height: 30%;
+    background: radial-gradient(ellipse 80% 100% at 50% 120%, rgba(180,140,80,0.15) 0%, transparent 80%);
+    z-index: 0;
+    pointer-events: none;
+  }
+
+  .login-wrap {
+    position: relative; z-index: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+  }
+
+  .brand-heading {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-weight: 300;
+    font-size: clamp(4rem, 12vw, 7rem);
+    color: var(--cream);
+    letter-spacing: 0.04em;
+    line-height: 1;
+    text-shadow: 0 0 60px rgba(210,180,120,0.4), 0 2px 20px rgba(0,0,0,0.5);
+    margin-bottom: -0.1em;
+    animation: fadeDown 1s ease both;
+  }
+
+  .brand-sub {
+    font-family: 'Jost', sans-serif;
+    font-weight: 200;
+    font-size: 0.75rem;
+    letter-spacing: 0.35em;
+    text-transform: uppercase;
+    color: var(--sand);
+    margin-bottom: 2.5rem;
+    animation: fadeDown 1s 0.2s ease both;
+    opacity: 0;
+  }
+
+  .card {
+    background: rgba(250,247,242,0.07);
+    backdrop-filter: blur(24px);
+    border: 1px solid rgba(245,240,232,0.12);
+    border-radius: 24px;
+    padding: 2.5rem 3rem;
+    width: min(420px, 90vw);
+    box-shadow: 0 30px 80px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.1);
+    animation: fadeUp 1s 0.3s ease both;
+    opacity: 0;
+  }
+
+  .card-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-weight: 300;
+    font-size: 1.6rem;
+    color: var(--cream);
+    text-align: center;
+    margin-bottom: 0.3rem;
+  }
+
+  .card-hint {
+    font-size: 0.72rem;
+    color: rgba(245,240,232,0.4);
+    text-align: center;
+    letter-spacing: 0.12em;
+    margin-bottom: 2rem;
+    font-weight: 300;
+  }
+
+  .field {
+    position: relative;
+    margin-bottom: 1.2rem;
+  }
+
+  .field-icon {
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 1.1rem;
+    pointer-events: none;
+  }
+
+  .field input {
+    width: 100%;
+    padding: 0.9rem 1rem 0.9rem 2.8rem;
+    background: rgba(245,240,232,0.08);
+    border: 1px solid rgba(245,240,232,0.15);
+    border-radius: 12px;
+    color: var(--cream);
+    font-family: 'Jost', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 300;
+    letter-spacing: 0.05em;
+    outline: none;
+    transition: all 0.3s;
+  }
+
+  .field input::placeholder { color: rgba(245,240,232,0.35); }
+  .field input:focus {
+    border-color: rgba(212,184,150,0.5);
+    background: rgba(245,240,232,0.12);
+    box-shadow: 0 0 0 3px rgba(212,184,150,0.1);
+  }
+
+  .btn-login {
+    width: 100%;
+    padding: 1rem;
+    margin-top: 0.5rem;
+    background: linear-gradient(135deg, #c4995a 0%, #8b6f47 100%);
+    border: none;
+    border-radius: 12px;
+    color: #fff;
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 1.2rem;
+    font-weight: 400;
+    letter-spacing: 0.08em;
+    cursor: pointer;
+    transition: all 0.3s;
+    box-shadow: 0 4px 20px rgba(139,111,71,0.4);
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 0 50px rgb(255, 201, 100);
+    transition: all 0.3s ease;
+  }
+  .login-btn:hover{
+    transform: translateY(-3px);
+    box-shadow:
+        0 0 25px rgba(247, 219, 127, 0.624),
+        0 0 15px rgba(251, 223, 132, 0.741);
+}
+
+  .signup-link{
+  margin-top:20px;
+  text-align:center;
+}
+
+.signup-link a{
+  text-decoration:none;
+  color:#fff;
+  font-size:16px;
+  padding:12px 24px;
+  border-radius:14px;
+
+  background:rgba(255,255,255,0.12);
+  backdrop-filter:blur(10px);
+
+  border:1px solid rgba(255,255,255,0.2);
+
+  transition:0.3s;
+  display:inline-block;
+}
+
+.signup-link a:hover{
+  background:rgba(255,255,255,0.2);
+  transform:scale(1.05);
+  box-shadow:0 0 15px rgba(255,255,255,0.2);
+}
+
+  .btn-login::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: linear-gradient(135deg, rgba(255,255,255,0.15) 0%, transparent 100%);
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+
+  .btn-login:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(139,111,71,0.5); }
+  .btn-login:hover::before { opacity: 1; }
+  .btn-login:active { transform: translateY(0); }
+
+  .divider {
+    display: flex; align-items: center; gap: 1rem;
+    margin: 1.2rem 0;
+    color: rgba(245,240,232,0.25);
+    font-size: 0.7rem;
+    letter-spacing: 0.2em;
+  }
+  .divider::before, .divider::after {
+    content: ''; flex: 1;
+    height: 1px;
+    background: rgba(245,240,232,0.12);
+  }
+
+  .btn-register {
+    width: 100%;
+    padding: 0.85rem;
+    background: transparent;
+    border: 1px solid rgba(212,184,150,0.3);
+    border-radius: 12px;
+    color: var(--sand);
+    font-family: 'Jost', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 300;
+    letter-spacing: 0.1em;
+    cursor: pointer;
+    transition: all 0.3s;
+  }
+  .btn-register:hover {
+    border-color: rgba(212,184,150,0.6);
+    background: rgba(212,184,150,0.08);
+    color: var(--cream);
+  }
+
+  .msg {
+    margin-top: 0.8rem;
+    text-align: center;
+    font-size: 0.8rem;
+    min-height: 1.2em;
+    color: #d4876a;
+    letter-spacing: 0.05em;
+  }
+  .msg.success { color: #8aad7a; }
+
+  /* Decorative plant dots */
+  .deco {
+    position: fixed;
+    width: 180px; height: 180px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(90,122,90,0.12) 0%, transparent 70%);
+    pointer-events: none; z-index: 1;
+  }
+  .deco-1 { bottom: 5%; left: 5%; width: 250px; height: 250px; }
+  .deco-2 { top: 10%; right: 8%; width: 200px; height: 200px; }
+
+  @keyframes fadeDown {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+</style>
+</head>
+<body>
+<div class="bg"></div>
+<div class="ceiling-glow"></div>
+<div class="floor-glow"></div>
+<div class="deco deco-1"></div>
+<div class="deco deco-2"></div>
+
+<div class="login-wrap">
+  <h1 class="brand-heading">Savoria</h1>
+  <p class="brand-sub">A sanctuary of taste &amp; warmth</p>
+
+  <div class="card">
+    <p class="card-title">Welcome back</p>
+    <p class="card-hint">SIGN IN TO CONTINUE</p>
+
+    <div class="field">
+      <span class="field-icon">🌿</span>
+      <input type="text" id="username" placeholder="Username" autocomplete="off">
+    </div>
+    <div class="field">
+      <span class="field-icon">🔑</span>
+      <input type="password" id="password" placeholder="Password">
+    </div>
+
+    <button class="btn-login" onclick="doLogin()">✨ Enter Savoria ✨</button>
+
+    <div class="divider">or</div>
+
+   <div class="signup-link">
+  <a href="/signup">✿ Create an Account ✿</a>
+</div>
+
+    <div class="msg" id="msg"></div>
+  </div>
+</div>
+
+<script>
+async function doLogin() {
+  const username = document.getElementById("username").value.trim();
+  const password = document.getElementById("password").value;
+  const msg = document.getElementById("msg");
+
+  if (!username || !password) {
+    msg.textContent = "Please fill in all fields";
+    return;
+  }
+
+  const res = await fetch("/login", {
+    method: "POST",
+    headers: {"Content-Type": "application/json"},
+    body: JSON.stringify({ username, password })
+  });
+
+  const data = await res.json();
+
+if(data.success){
+
+  if(username === "admin"){
+    window.location.href = "/admin";
+  }else{
+    window.location.href = "/home";
+  }
+
+}else{
+
+  msg.textContent = data.message;
+
+}
+}
+
+async function doRegister() {
+  const username = document.getElementById('username').value.trim();
+  const password = document.getElementById('password').value;
+  const msg = document.getElementById('msg');
+  if (!username || !password) { msg.textContent = 'Please fill in all fields'; return; }
+  const res = await fetch('/api/register', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ username, password })
+  });
+  const data = await res.json();
+  if (data.success) {
+    msg.className = 'msg success';
+    msg.textContent = 'Account created! Logging you in...';
+    await fetch('/api/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username, password })
+    });
+    setTimeout(() => window.location.href = '/home', 800);
+  } else {
+    msg.textContent = data.message || 'Registration failed';
+  }
+}
+window.onload = function () {
+    document.getElementById("username").value = "";
+    document.getElementById("password").value = "";
+};
+document.addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
+</script>
+</body>
+</html>

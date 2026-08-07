@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Savoria — Payment</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400;1,600&family=Jost:wght@200;300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --cream: #f5f0e8;
+    --warm-white: #faf7f2;
+    --sand: #d4b896;
+    --taupe: #150c02;
+    --brown: #120c04;
+    --dark: #110901;
+    --text-light: #dfdddb;
+  }
+  body { font-family: 'Jost', sans-serif; background: var(--sand); color: var(--dark); min-height: 100vh; }
+
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 1.2rem 3rem;
+    background: rgba(94, 72, 39, 0.95);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid rgba(139,111,71,0.1);
+  }
+  .nav-logo { font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 2rem; font-weight: 300; color: var(--dark); text-decoration: none; }
+  .nav-links { display: flex; gap: 0.3rem; }
+  .nav-links a { text-decoration: none; color: var(--text-light); font-size: 0.72rem; font-weight: 300; letter-spacing: 0.2em; text-transform: uppercase; padding: 0.5rem 1rem; border-radius: 50px; transition: all 0.3s; border: 1px solid transparent; }
+  .nav-links a:hover { color: var(--dark); border-color: rgba(139,111,71,0.25); background: rgba(139,111,71,0.05); }
+
+  .page {
+    min-height: 100vh;
+    padding: 8rem 4rem 4rem;
+    max-width: 700px;
+    margin: 0 auto;
+  }
+
+  .page-eyebrow { font-size: 0.68rem; letter-spacing: 0.4em; text-transform: uppercase; color: var(--taupe); margin-bottom: 0.5rem; }
+  .page-title { font-family: 'Cormorant Garamond', serif; font-style: italic; font-weight: 300; font-size: clamp(2.5rem, 6vw, 4rem); color: var(--dark); margin-bottom: 2.5rem; }
+
+  .amount-display {
+    background: linear-gradient(135deg, #3a2e22, #5a4030);
+    border-radius: 20px;
+    padding: 2rem 2.5rem;
+    margin-bottom: 2rem;
+    color: var(--cream);
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .amount-label { font-size: 0.75rem; letter-spacing: 0.2em; text-transform: uppercase; opacity: 0.5; margin-bottom: 0.4rem; }
+  .amount-value { font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 3rem; font-weight: 300; }
+  .amount-icon { font-size: 3rem; opacity: 0.4; }
+
+  .methods-card {
+    background: #fff;
+    border-radius: 20px;
+    border: 1px solid rgba(238, 231, 223, 0.25);
+    overflow: hidden;
+    margin-bottom: 2rem;
+    box-shadow: 0 4px 30px rgba(139,111,71,0.05);
+  }
+
+  .methods-header {
+    padding: 1.5rem 2rem;
+    background: var(--cream);
+    border-bottom: 1px solid rgba(212,184,150,0.2);
+  }
+  .methods-header h3 { font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 1.2rem; color: var(--dark); }
+
+  .method-option {
+    display: flex; align-items: center; gap: 1.5rem;
+    padding: 1.5rem 2rem;
+    cursor: pointer;
+    border-bottom: 1px solid rgba(212,184,150,0.1);
+    transition: background 0.2s;
+    position: relative;
+  }
+  .method-option:last-child { border-bottom: none; }
+  .method-option:hover { background: rgb(237, 237, 236); }
+  .method-option.selected { background: rgba(139,111,71,0.06); }
+
+  .method-radio {
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    border: 2px solid rgba(139,111,71,0.35);
+    flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.3s;
+  }
+  .method-option.selected .method-radio {
+    border-color: var(--brown);
+    background: var(--brown);
+  }
+  .method-option.selected .method-radio::after {
+    content: '';
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: #fff;
+  }
+
+  .method-icon { font-size: 2rem; }
+  .method-label { font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 1.15rem; color: var(--dark); }
+  .method-desc { font-size: 0.9rem; font-weight: 300; color: var(--dark); margin-top: 0.1rem; }
+
+  /* Online payment sub-options */
+  .online-sub {
+    display: none;
+    padding: 1rem 2rem 1.5rem 5rem;
+    background: rgba(245,240,232,0.5);
+    border-top: 1px solid rgba(212,184,150,0.1);
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+  .online-sub.show { display: flex; }
+
+  .pay-method-btn {
+    padding: 0.6rem 1.4rem;
+    background: transparent;
+    border: 1px solid rgba(139,111,71,0.3);
+    border-radius: 50px;
+    color: var(--brown);
+    font-size: 0.8rem; letter-spacing: 0.08em;
+    cursor: pointer; transition: all 0.3s;
+  }
+  .pay-method-btn:hover, .pay-method-btn.active {
+    background: var(--brown); color: #fff;
+    border-color: var(--brown);
+  }
+
+  .submit-row {
+    display: flex; justify-content: flex-end;
+    margin-top: 1rem;
+  }
+
+  .btn-submit {
+    padding: 1rem 3rem;
+    background: linear-gradient(135deg, #c4995a, #8b6f47);
+    border: none; border-radius: 50px;
+    color: #fff;
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic; font-size: 1.2rem;
+    cursor: pointer; transition: all 0.3s;
+    box-shadow: 0 4px 20px rgba(139,111,71,0.35);
+  }
+  .btn-submit:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(139,111,71,0.45); }
+
+  .success-msg {
+    display: none;
+    text-align: center;
+    padding: 3rem 2rem;
+    background: #fff;
+    border-radius: 20px;
+    border: 1px solid rgba(212,184,150,0.25);
+    box-shadow: 0 4px 30px rgba(139,111,71,0.06);
+    margin-top: 2rem;
+    animation: popIn 0.5s ease;
+  }
+  .success-msg.show { display: block; }
+  .success-msg .big-emoji { font-size: 4rem; margin-bottom: 1rem; display: block; }
+  .success-msg h2 { font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 2rem; color: var(--dark); margin-bottom: 0.5rem; }
+  .success-msg p { font-size: 0.85rem; font-weight: 300; color: var(--taupe); }
+
+  @keyframes popIn {
+    from { opacity: 0; transform: scale(0.9); }
+    to { opacity: 1; transform: scale(1); }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="/home" class="nav-logo">Savoria</a>
+  <div class="nav-links">
+    <a href="/home">Home</a>
+    <a href="/menu">Menu</a>
+    <a href="/order">Order</a>
+    <a href="/payment">Payment</a>
+    <a href="/feedback">Feedback</a>
+  </div>
+</nav>
+
+<div class="page">
+  <p class="page-eyebrow">✦ Final Step</p>
+  <h1 class="page-title">Payment Method</h1>
+
+  <div class="amount-display">
+    <div>
+      <div class="amount-label">Total Amount</div>
+      <div class="amount-value" id="pay-amount">₹0</div>
+    </div>
+    <div class="amount-icon">💳</div>
+  </div>
+
+  <div class="methods-card">
+    <div class="methods-header">
+      <h3>Choose how you'd like to pay</h3>
+    </div>
+
+    <div class="method-option" id="cod-opt" onclick="selectMethod('cod')">
+      <div class="method-radio"></div>
+      <div class="method-icon">💵</div>
+      <div>
+        <div class="method-label">Cash on Delivery</div>
+        <div class="method-desc">Pay when your order arrives at your table</div>
+      </div>
+    </div>
+
+    <div class="method-option" id="online-opt" onclick="selectMethod('online')">
+      <div class="method-radio"></div>
+      <div class="method-icon">📱</div>
+      <div>
+        <div class="method-label">Pay Online</div>
+        <div class="method-desc">UPI, Cards, Net Banking & more</div>
+      </div>
+    </div>
+
+    <div class="online-sub" id="online-sub">
+      <button class="pay-method-btn" onclick="selectOnline(this, 'UPI')">📲 UPI</button>
+      <button class="pay-method-btn" onclick="selectOnline(this, 'Credit Card')">💳 Credit Card</button>
+      <button class="pay-method-btn" onclick="selectOnline(this, 'Debit Card')">🏦 Debit Card</button>
+      <button class="pay-method-btn" onclick="selectOnline(this, 'Net Banking')">🌐 Net Banking</button>
+    </div>
+  </div>
+
+  <div class="submit-row">
+    <button class="btn-submit" onclick="submitPayment()">✨ Submit Payment ✨</button>
+  </div>
+
+  <div class="success-msg" id="success-msg">
+    <span class="big-emoji">🎉</span>
+    <h2>Payment Successful!</h2>
+    <p>Thank you for dining with Savoria. Your order is confirmed and being prepared with love.</p>
+    <p style="margin-top:0.5rem; color:var(--brown);">Enjoy your meal! 🍽️</p>
+  </div>
+</div>
+
+<script>
+let selectedMethod = '';
+let selectedOnlineMethod = '';
+
+// Load total from localStorage
+const total = localStorage.getItem('savoria_total') || 0;
+document.getElementById('pay-amount').textContent = `₹${total}`;
+
+function selectMethod(m) {
+  selectedMethod = m;
+  document.querySelectorAll('.method-option').forEach(el => el.classList.remove('selected'));
+  document.getElementById(`${m}-opt`).classList.add('selected');
+  const sub = document.getElementById('online-sub');
+  sub.classList.toggle('show', m === 'online');
+}
+
+function selectOnline(btn, method) {
+  selectedOnlineMethod = method;
+  document.querySelectorAll('.pay-method-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+async function submitPayment() {
+ const amount = Number(total);
+
+if (amount <= 0) {
+  alert("Your cart is empty. Please add items before making a payment.");
+  return;
+}
+  if (!selectedMethod) {
+    alert('Please select a payment method');
+    return;
+  }
+  if (selectedMethod === 'online' && !selectedOnlineMethod) {
+    alert('Please select an online payment option');
+    return;
+  }
+  const method = selectedMethod === 'online' ? selectedOnlineMethod : 'Cash on Delivery';
+  await fetch('/api/orders', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ total, payment_method: method })
+  });
+  localStorage.removeItem('savoria_total');
+  document.getElementById('success-msg').classList.add('show');
+  document.querySelector('.btn-submit').style.display = 'none';
+  document.querySelector('.methods-card').style.opacity = '0.4';
+  document.querySelector('.methods-card').style.pointerEvents = 'none';
+  document.querySelector('.amount-display').style.opacity = '0.4';
+  document.getElementById('success-msg').scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+</script>
+</body>
+</html>

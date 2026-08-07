@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Savoria — Feedback</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400;1,600&family=Jost:wght@200;300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --cream: #f5f0e8;
+    --warm-white: #faf7f2;
+    --sand: #d4b896;
+    --taupe: #b89a7a;
+    --brown: #8b6f47;
+    --dark: #3a2e22;
+    --text-light: #7a6a58;
+    --gold: #c4852a;
+  }
+  body {
+    font-family: 'Jost', sans-serif;
+    min-height: 100vh;
+    background: linear-gradient(160deg, #b8977a 0%, #9a7a5a 30%, #7a5a3a 60%, #5a3a1a 100%);
+    display: flex; flex-direction: column; align-items: center;
+    position: relative; overflow-x: hidden;
+  }
+
+  /* Texture overlay like the 5th image */
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background: 
+      radial-gradient(ellipse 60% 60% at 30% 70%, rgba(255,255,255,0.04) 0%, transparent 70%),
+      radial-gradient(ellipse 40% 50% at 70% 20%, rgba(255,255,255,0.03) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  nav {
+    width: 100%; z-index: 100;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 1.2rem 3rem;
+    background: rgba(90,58,26,0.3);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+  }
+  .nav-logo { font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 2rem; font-weight: 300; color: var(--cream); text-decoration: none; }
+  .nav-links { display: flex; gap: 0.3rem; }
+  .nav-links a { text-decoration: none; color: rgba(245,240,232,0.6); font-size: 0.72rem; font-weight: 300; letter-spacing: 0.2em; text-transform: uppercase; padding: 0.5rem 1rem; border-radius: 50px; transition: all 0.3s; border: 1px solid transparent; }
+  .nav-links a:hover { color: var(--cream); border-color: rgba(245,240,232,0.2); }
+
+  .page-wrap {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem 2rem 5rem;
+    width: 100%;
+  }
+
+  .page-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic; font-weight: 300;
+    font-size: clamp(2.5rem, 8vw, 4.5rem);
+    color: #fff;
+    text-align: center;
+    margin-bottom: 2.5rem;
+    text-shadow: 0 2px 20px rgba(0,0,0,0.2);
+    letter-spacing: 0.02em;
+  }
+
+  /* THE FEEDBACK CARD */
+  .feedback-card {
+    background: rgba(255,255,255,0.88);
+    backdrop-filter: blur(10px);
+    border-radius: 24px;
+    width: min(480px, 90vw);
+    position: relative;
+    padding: 0 0 2.5rem;
+    box-shadow: 0 30px 80px rgba(58,30,10,0.3);
+    border: 1px solid rgba(255,255,255,0.6);
+  }
+
+  /* Circle image at top */
+  .card-avatar {
+    width: 130px; height: 130px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #c4995a 0%, #8b6f47 60%, #5a3a1a 100%);
+    margin: 0 auto;
+    position: relative;
+    top: -55px;
+    margin-bottom: -35px;
+    border: 4px solid rgba(255,255,255,0.8);
+    box-shadow: 0 8px 30px rgba(90,60,20,0.3);
+    display: flex; align-items: center; justify-content: center;
+    overflow: hidden;
+  }
+
+  .avatar-inner {
+    width: 100%; height: 100%;
+    background: linear-gradient(135deg, rgba(200,160,100,0.8), rgba(120,80,40,0.9));
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 2px;
+  }
+
+  .avatar-savoria {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic; font-size: 0.9rem;
+    color: rgba(255,255,255,0.9);
+    font-weight: 300; letter-spacing: 0.1em;
+  }
+
+  .avatar-icon img{ font-size: 2rem;
+  width:150px;
+height:150px;
+object-fit:cover;
+border-radius:50%; }
+
+  .card-body { padding: 0 2.5rem; }
+
+  .divider-line {
+    height: 1px;
+    background: rgba(139,111,71,0.15);
+    margin: 1.2rem 0;
+  }
+
+  .experience-textarea {
+    width: 100%;
+    min-height: 90px;
+    background: transparent;
+    border: none;
+    outline: none;
+    resize: none;
+    font-family: 'Jost', sans-serif;
+    font-size: 0.9rem; font-weight: 300;
+    color: var(--dark);
+    line-height: 1.6;
+    letter-spacing: 0.03em;
+  }
+  .experience-textarea::placeholder { color: rgba(13, 6, 0, 0.642); font-style: italic; }
+
+  /* STARS */
+  .stars-row {
+    display: flex; gap: 0.5rem; justify-content: center;
+    margin: 1.2rem 0;
+  }
+
+  .star {
+    font-size: 2rem;
+    cursor: pointer;
+    transition: transform 0.2s;
+    filter: grayscale(1) opacity(0.4);
+    user-select: none;
+  }
+  .star:hover { transform: scale(1.2); }
+  .star.lit { filter: none; }
+  .star.lit { animation: starPop 0.3s ease; }
+
+  @keyframes starPop {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.35); }
+    100% { transform: scale(1); }
+  }
+
+  .btn-submit {
+    width: calc(100% - 5rem);
+    margin: 0 2.5rem;
+    padding: 1rem;
+    background: linear-gradient(135deg, #b88040, #7a5525);
+    border: none; border-radius: 14px;
+    color: #fff;
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic; font-size: 1.2rem;
+    cursor: pointer; transition: all 0.3s;
+    box-shadow: 0 4px 20px rgba(120,80,30,0.35);
+  }
+  .btn-submit:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(120,80,30,0.45); }
+
+  .handle {
+    text-align: center;
+    margin-top: 1.8rem;
+    font-size: 0.8rem; letter-spacing: 0.12em;
+    color: rgba(14, 9, 3, 0.6);
+  }
+
+  .success-overlay {
+    display: none;
+    position: absolute; inset: 0;
+    background: rgba(255,255,255,0.95);
+    border-radius: 24px;
+    align-items: center; justify-content: center;
+    flex-direction: column; gap: 1rem;
+    text-align: center; padding: 2rem;
+    animation: fadeIn 0.4s ease;
+  }
+  .success-overlay.show { display: flex; }
+  .success-overlay .big { font-size: 4rem; }
+  .success-overlay h3 { font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 1.8rem; color: var(--dark); }
+  .success-overlay p { font-size: 0.85rem; font-weight: 300; color: var(--dark); }
+
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+</style>
+</head>
+<body>
+
+<nav id="navbar">
+  <a href="/home.html" class="nav-logo">Savoria</a>
+
+  <div class="nav-links">
+    <a href="/home.html">HOME</a>
+    <a href="/menu.html">MENU</a>
+    <a href="/order.html">ORDER</a>
+    <a href="/payment.html">PAYMENT</a>
+    <a href="/feedback.html">FEEDBACK</a>
+
+    <a href="/login.html"
+       onclick="logoutUser()"
+       class="logout-btn">
+       LOGOUT
+    </a>
+  </div>
+</nav>
+<div class="page-wrap">
+  <h1 class="page-title">Voices of Delight</h1>
+
+  <div class="feedback-card">
+    <div class="card-avatar">
+      <div class="avatar-inner">
+        <div class="avatar-icon">
+          <img src="images/feed.png" alt="avatar">
+        </div>
+        <div class="avatar-savoria">Savoria</div>
+      </div>
+    </div>
+
+    <div class="card-body">
+      <textarea
+        class="experience-textarea"
+        id="feedback-text"
+        placeholder="Your experience... tell us how it felt ✨"
+        maxlength="500"
+      ></textarea>
+
+      <div class="divider-line"></div>
+
+      <div class="stars-row">
+        <span class="star" data-val="1" onclick="rateStar(1)">⭐</span>
+        <span class="star" data-val="2" onclick="rateStar(2)">⭐</span>
+        <span class="star" data-val="3" onclick="rateStar(3)">⭐</span>
+        <span class="star" data-val="4" onclick="rateStar(4)">⭐</span>
+        <span class="star" data-val="5" onclick="rateStar(5)">⭐</span>
+      </div>
+    </div>
+
+    <button class="btn-submit" onclick="submitFeedback()">✨ Submit Feedback ✨</button>
+
+    <!-- Success overlay -->
+    <div class="success-overlay" id="success-overlay">
+      <div class="big">🌟</div>
+      <h3>Thank you!</h3>
+      <p>Your voice delights us.<br>We'll keep crafting magic for you.</p>
+      <p style="margin-top:0.5rem; font-style:italic; color:var(--brown);">— The Savoria Team</p>
+    </div>
+  </div>
+
+  <p class="handle">@savoria</p>
+</div>
+
+<script>
+let currentRating = 0;
+
+function rateStar(val) {
+  currentRating = val;
+  document.querySelectorAll('.star').forEach((s, i) => {
+    if (i < val) s.classList.add('lit');
+    else s.classList.remove('lit');
+  });
+}
+
+// Hover preview
+document.querySelectorAll('.star').forEach((s, idx, arr) => {
+  s.addEventListener('mouseenter', () => {
+    arr.forEach((star, i) => {
+      star.style.filter = i <= idx ? 'none' : 'grayscale(1) opacity(0.4)';
+    });
+  });
+  s.addEventListener('mouseleave', () => {
+    arr.forEach((star, i) => {
+      const isLit = i < currentRating;
+      star.style.filter = isLit ? 'none' : 'grayscale(1) opacity(0.4)';
+    });
+  });
+});
+
+async function submitFeedback() {
+  if (!currentRating) { alert('Please rate your experience with the stars ⭐'); return; }
+  const message = document.getElementById('feedback-text').value;
+  const res = await fetch('/api/feedback', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ rating: currentRating, message })
+  });
+  const data = await res.json();
+  if (data.success) {
+    document.getElementById('success-overlay').classList.add('show');
+  }
+}
+function logoutUser(){
+
+ localStorage.removeItem('user');
+
+ alert('Logged out successfully');
+
+}
+</script>
+</body>
+</html>
