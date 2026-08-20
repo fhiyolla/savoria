@@ -1,4 +1,4 @@
-
+require('dotenv').config();
 const express = require('express');
 const multer = require('multer');
 const path = require('path');
@@ -83,7 +83,7 @@ CREATE TABLE IF NOT EXISTS admin (
 `);
 
 (async () => {
-  const hash = await bcrypt.hash("1234", 10);
+ const hash = await bcrypt.hash(process.env.ADMIN_PASSWORD, 10);
 
   const user = db.prepare(
     "SELECT * FROM users WHERE username = ?"
